@@ -1,0 +1,24 @@
+# Sidecar quiz. If this file exists, it replaces the quiz in the page frontmatter.
+# Delete it to fall back to the quiz inside system-design/idempotency.md.
+quiz:
+  - kind: mc
+    question: Two requests with the same idempotency key arrive together. What must be true?
+    choices:
+      - Both execute the charge. The second one refunds.
+      - One wins the insert of the key. The other waits and returns the stored result.
+      - The load balancer drops one.
+      - Redis pub/sub orders them.
+    answer: 1
+    explain: Uniqueness has to be atomic with the effect. A check-then-act in the app loses the race.
+  - kind: mc
+    question: Which status should you retry?
+    choices:
+      - 400 Bad Request.
+      - 422 Unprocessable.
+      - 503, and 429 after the Retry-After delay.
+      - A validation error the user must fix.
+    answer: 2
+    explain: Retry the transient failures. Retrying a 400 repeats a request the server has already refused.
+  - kind: short
+    question: How long do you keep an idempotency record?
+    reveal: Longer than the client is willing to retry, and longer than the upstream's ambiguity window. Twenty-four hours is a common product default for payments. Too short and a late retry double-applies. Too long is just storage, which is the cheaper bug.

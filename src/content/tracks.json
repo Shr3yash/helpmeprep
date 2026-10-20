@@ -1,0 +1,34 @@
+{
+  "tracks": [
+    {
+      "id": "system-design",
+      "title": "System design",
+      "eyebrow": "Primary track",
+      "summary": "A 45-minute delivery clock, the concepts and technologies interviews actually probe, reusable patterns, and worked problems from URL shortener through agent eval.",
+      "status": "ready",
+      "sections": [
+        "Start here",
+        "Core concepts",
+        "Key technologies",
+        "Patterns",
+        "Worked problems"
+      ]
+    },
+    {
+      "id": "lld",
+      "title": "Low-level design",
+      "eyebrow": "Started",
+      "summary": "Object APIs and concurrency. The first worked problem is a TTL cache with LRU eviction.",
+      "status": "ready",
+      "sections": ["Start here", "Worked problems"]
+    },
+    {
+      "id": "dsa",
+      "title": "DSA",
+      "eyebrow": "Started",
+      "summary": "Timed coding drills in C++. A standard-library toolkit, then a four-part dependency resolver.",
+      "status": "ready",
+      "sections": ["Start here", "Toolkit", "Worked problems"]
+    }
+  ]
+}

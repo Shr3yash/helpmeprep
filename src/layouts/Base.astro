@@ -1,0 +1,53 @@
+---
+import "@fontsource/source-sans-3/400.css";
+import "@fontsource/source-sans-3/600.css";
+import "@fontsource/source-sans-3/700.css";
+import "@fontsource/source-serif-4/400.css";
+import "@fontsource/source-serif-4/600.css";
+import "@fontsource/ibm-plex-mono/400.css";
+import "../styles/global.css";
+import Sidebar from "../components/Sidebar.astro";
+import { siteBase } from "../lib/site";
+
+interface Props {
+  title: string;
+  description?: string;
+  trackId?: string;
+  crumb?: string;
+}
+const { title, description = "Interview prep notes by Shreyash Bhatkar.", trackId, crumb } = Astro.props;
+const base = siteBase();
+const fullTitle = title === "HelpMePrep" ? title : `${title} · HelpMePrep`;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="description" content={description} />
+    <title>{fullTitle}</title>
+    <link rel="icon" href={`${base}favicon.svg`} />
+  </head>
+  <body>
+    <a class="skip" href="#content">Skip to content</a>
+    <div class="backdrop"></div>
+    <div class="app">
+      <Sidebar activeTrack={trackId} />
+      <div class="main">
+        <header class="topbar">
+          <button class="menu-btn" type="button" data-menu aria-label="Open sections">Sections</button>
+          <div class="crumb">{crumb ? <Fragment set:html={crumb} /> : <strong>HelpMePrep</strong>}</div>
+          <div class="spacer"></div>
+          <button class="icon-btn" type="button" data-theme-toggle>Dark</button>
+        </header>
+        <div id="content">
+          <slot />
+        </div>
+      </div>
+    </div>
+    <script>
+      import "../scripts/client.ts";
+    </script>
+  </body>
+</html>

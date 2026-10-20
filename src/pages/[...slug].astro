@@ -1,0 +1,15 @@
+---
+import { allPages, pageSlug } from "../lib/pages";
+import Article from "../layouts/Article.astro";
+
+export async function getStaticPaths() {
+  const pages = await allPages();
+  return pages.map((entry) => ({
+    params: { slug: pageSlug(entry) },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+---
+<Article entry={entry} />

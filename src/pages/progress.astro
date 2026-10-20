@@ -1,0 +1,27 @@
+---
+import { getCollection } from "astro:content";
+import Base from "../layouts/Base.astro";
+import { allPages, companyRouteId, indexPayload } from "../lib/pages";
+import { siteBase } from "../lib/site";
+
+const study = indexPayload(await allPages());
+const companies = (await getCollection("companies")).map((c) => ({
+  slug: c.data.slug || `companies/${companyRouteId(c)}`,
+  title: c.data.title,
+  track: "companies",
+  section: "Onsite",
+  description: c.data.summary,
+}));
+const pages = [...study, ...companies];
+const base = siteBase();
+const json = JSON.stringify(pages).replace(/</g, "\\u003c");
+---
+<Base title="Progress" description="Local completion and quiz scores." crumb="<strong>Progress</strong>">
+  <div class="progress-page" data-progress-page data-base={base}>
+    <script type="application/json" data-progress-json set:html={json}></script>
+    <p class="kicker">This browser only</p>
+    <h1>Progress</h1>
+    <p class="lede">Completion checkmarks and multiple-choice scores live in localStorage. Clearing site data resets them. Company pages are tracked when you mark them complete from the article.</p>
+    <div class="prose" data-progress-body></div>
+  </div>
+</Base>

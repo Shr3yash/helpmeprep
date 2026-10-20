@@ -1,0 +1,74 @@
+---
+import { allPages, navForTrack, pageSlug } from "../lib/pages";
+import { siteBase } from "../lib/site";
+import { trackConfigs } from "../lib/tracks";
+
+interface Props {
+  activeTrack?: string;
+}
+const { activeTrack = "system-design" } = Astro.props;
+const base = siteBase();
+const pages = await allPages();
+const trackIds = new Set(pages.map((p) => p.data.track));
+const tracks = [
+  ...trackConfigs.filter((t) => trackIds.has(t.id)),
+  ...[...trackIds]
+    .filter((id) => !trackConfigs.some((t) => t.id === id))
+    .map((id) => ({
+      id,
+      title: id,
+      eyebrow: "Added",
+      summary: "",
+      status: "ready" as const,
+      sections: [] as string[],
+    })),
+];
+const current = tracks.some((t) => t.id === activeTrack) ? activeTrack : tracks[0]?.id;
+const nav = current ? await navForTrack(current) : [];
+const baseNoSlash = base.endsWith("/") ? base.slice(0, -1) : base;
+const raw = Astro.url.pathname.startsWith(baseNoSlash)
+  ? Astro.url.pathname.slice(baseNoSlash.length)
+  : Astro.url.pathname;
+const path = (raw.length > 1 && raw.endsWith("/") ? raw.slice(0, -1) : raw) || "/";
+---
+<aside class="sidebar">
+  <a class="brand" href={base}>
+    <span class="brand-mark">H</span>
+    <span>
+      <span class="brand-name">HelpMePrep</span>
+      <span class="brand-sub">interview notes</span>
+    </span>
+  </a>
+  <a class="side-search" data-search-link href={`${base}search`}>
+    Search notes
+    <kbd>/</kbd>
+  </a>
+  <div class="side-links">
+    <a href={base} aria-current={path === "/" ? "page" : undefined}>Home</a>
+    <a href={`${base}companies`} aria-current={path.startsWith("/companies") ? "page" : undefined}>Companies</a>
+    <a href={`${base}progress`} aria-current={path === "/progress" ? "page" : undefined}>Progress</a>
+  </div>
+  <nav class="track-switch" aria-label="Tracks">
+    {tracks.map((t) => (
+      <a href={`${base}${pageSlug((pages.find((p) => p.data.track === t.id) ?? pages[0])!)}`} aria-current={t.id === current ? "true" : undefined}>
+        {t.title}
+      </a>
+    ))}
+  </nav>
+  {nav.map((group) => (
+    <div class="nav-section">
+      <h2>{group.section}</h2>
+      {group.pages.map((p) => {
+        const slug = pageSlug(p);
+        const href = `${base}${slug}`;
+        const currentPage = path === `/${slug}`;
+        return (
+          <a href={href} data-slug={slug} aria-current={currentPage ? "page" : undefined}>
+            <span class="dot" aria-hidden="true"></span>
+            <span>{p.data.title}</span>
+          </a>
+        );
+      })}
+    </div>
+  ))}
+</aside>

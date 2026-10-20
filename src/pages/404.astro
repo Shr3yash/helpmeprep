@@ -1,0 +1,11 @@
+---
+import Base from "../layouts/Base.astro";
+import { siteBase } from "../lib/site";
+const base = siteBase();
+---
+<Base title="Not found">
+  <article class="article">
+    <h1>That page is not in the notes.</h1>
+    <p class="lede"><a href={base}>Back home</a> or <a href={`${base}search`}>search</a>.</p>
+  </article>
+</Base>

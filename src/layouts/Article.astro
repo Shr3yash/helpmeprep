@@ -1,0 +1,56 @@
+---
+import { render } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+import Base from "./Base.astro";
+import Callouts from "../components/Callouts.astro";
+import Quiz from "../components/Quiz.astro";
+import { neighborPages, pageSlug, pagesByTrack, quizFor, readingMinutes } from "../lib/pages";
+import { siteBase } from "../lib/site";
+
+interface Props {
+  entry: CollectionEntry<"pages"> | CollectionEntry<"companies">;
+  pager?: boolean;
+}
+const { entry, pager = true } = Astro.props;
+const { Content } = await render(entry);
+const slug = pageSlug(entry);
+const base = siteBase();
+const siblings = pager ? await pagesByTrack(entry.data.track) : [];
+const { prev, next } = neighborPages(siblings, entry.id);
+const minutes = readingMinutes(entry.body);
+const quiz = quizFor(entry);
+const crumb = `<span>${entry.data.section}</span> · <strong>${entry.data.title}</strong>`;
+---
+<Base title={entry.data.title} description={entry.data.description} trackId={entry.data.track} crumb={crumb}>
+  <article class="article" data-pagefind-body>
+    <p class="kicker" data-pagefind-meta={`section:${entry.data.section}`}>{entry.data.section}</p>
+    <h1 data-pagefind-meta={`title:${entry.data.title}`}>{entry.data.title}</h1>
+    <p class="lede">{entry.data.description}</p>
+    <div class="meta-row">
+      <span class="pill">{minutes} min read</span>
+      <span class="pill">{entry.data.track}</span>
+      <button class="complete-btn" type="button" data-complete={slug} data-slug={slug}>Mark complete</button>
+    </div>
+    <slot name="before" />
+    <div class="prose">
+      <Content />
+    </div>
+    <Callouts
+      failureModes={entry.data.failureModes}
+      sayThis={entry.data.sayThis}
+      gaps={entry.data.gaps}
+      references={entry.data.references}
+    />
+    <Quiz slug={slug} quiz={quiz} />
+    {pager && (
+      <nav class="pager" aria-label="Adjacent pages">
+        {prev ? (
+          <a href={`${base}${pageSlug(prev)}`}><small>Previous</small>{prev.data.title}</a>
+        ) : <span></span>}
+        {next ? (
+          <a href={`${base}${pageSlug(next)}`}><small>Next</small>{next.data.title}</a>
+        ) : <span></span>}
+      </nav>
+    )}
+  </article>
+</Base>

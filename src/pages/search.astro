@@ -1,0 +1,42 @@
+---
+import Base from "../layouts/Base.astro";
+import { siteBase } from "../lib/site";
+const base = siteBase();
+---
+<Base title="Search" description="Full-text search across HelpMePrep notes." crumb="<strong>Search</strong>">
+  <div class="search-page">
+    <p class="kicker">Full-text</p>
+    <h1>Search</h1>
+    <p class="lede">Searches the built notes in this browser. It is generated at build time, so it works on GitHub Pages without a server.</p>
+    <div id="search"></div>
+  </div>
+  <link href={`${base}pagefind/pagefind-ui.css`} rel="stylesheet" />
+  <script src={`${base}pagefind/pagefind-ui.js`} is:inline></script>
+  <script define:vars={{ base }} is:inline>
+    window.addEventListener("DOMContentLoaded", () => {
+      const ui = new PagefindUI({
+        element: "#search",
+        showSubResults: true,
+        baseUrl: base,
+      });
+      const params = new URLSearchParams(location.search);
+      const q = params.get("q");
+      if (q) ui.triggerSearch(q);
+      const input = document.querySelector("#search input");
+      if (input) input.focus();
+      // Pagefind records each note as a directory (…/idempotency/). Open the slash-less URL.
+      document.getElementById("search")?.addEventListener("click", (event) => {
+        const el = event.target instanceof Element ? event.target : event.target.parentElement;
+        const anchor = el && el.closest("a");
+        if (!anchor) return;
+        const url = new URL(anchor.href, location.origin);
+        if (url.origin !== location.origin) return;
+        if (url.pathname.length > 1 && url.pathname.endsWith("/")) {
+          event.preventDefault();
+          url.pathname = url.pathname.replace(/\/+$/, "");
+          location.href = url.pathname + url.search + url.hash;
+        }
+      }, true);
+    });
+  </script>
+</Base>

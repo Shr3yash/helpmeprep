@@ -1,0 +1,30 @@
+---
+import { getCollection } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import { companyRouteId } from "../../lib/pages";
+import { siteBase } from "../../lib/site";
+
+const base = siteBase();
+const companies = (await getCollection("companies")).sort((a, b) => a.data.order - b.data.order);
+---
+<Base title="Companies" description="Round-by-round onsite tracks." crumb="<strong>Companies</strong>">
+  <article class="article">
+    <p class="kicker">Onsite tracks</p>
+    <h1>Companies</h1>
+    <p class="lede">One tab per company. Each track lists rounds, what is scored, a checklist, links into the system-design notes, practice, and stories that still have open placeholders.</p>
+    <nav class="tabs" aria-label="Companies">
+      {companies.map((c) => (
+        <a href={`${base}companies/${companyRouteId(c)}`}>{c.data.title}</a>
+      ))}
+    </nav>
+    <div class="grid-cards">
+      {companies.map((c) => (
+        <a class="card" href={`${base}companies/${companyRouteId(c)}`}>
+          <div class="eyebrow">{c.data.when}</div>
+          <h2>{c.data.title}</h2>
+          <p>{c.data.role}. {c.data.where}</p>
+        </a>
+      ))}
+    </div>
+  </article>
+</Base>

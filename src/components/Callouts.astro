@@ -1,0 +1,37 @@
+---
+interface Props {
+  failureModes: string[];
+  sayThis: string[];
+  gaps: string[];
+  references: { title: string; url: string }[];
+}
+const { failureModes, sayThis, gaps, references } = Astro.props;
+---
+{failureModes.length > 0 && (
+  <aside class="callout fail">
+    <h2>Common failure modes</h2>
+    <ul>{failureModes.map((item) => <li>{item}</li>)}</ul>
+  </aside>
+)}
+{sayThis.length > 0 && (
+  <aside class="callout say">
+    <h2>Say this in the interview</h2>
+    <ul>{sayThis.map((item) => <li>{item}</li>)}</ul>
+  </aside>
+)}
+{gaps.length > 0 && (
+  <aside class="callout gap">
+    <h2>Gaps</h2>
+    <ul>{gaps.map((item) => <li>{item}</li>)}</ul>
+  </aside>
+)}
+{references.length > 0 && (
+  <section class="refs">
+    <h2>Further reading</h2>
+    <ul>
+      {references.map((ref) => (
+        <li><a href={ref.url} rel="noreferrer">{ref.title}</a></li>
+      ))}
+    </ul>
+  </section>
+)}

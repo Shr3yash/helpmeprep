@@ -1,0 +1,58 @@
+---
+import Base from "../layouts/Base.astro";
+import { allPages, companyRouteId, pageSlug } from "../lib/pages";
+import { siteBase } from "../lib/site";
+import { trackConfigs } from "../lib/tracks";
+import { getCollection } from "astro:content";
+
+const base = siteBase();
+const pages = await allPages();
+const companies = (await getCollection("companies")).sort((a, b) => a.data.order - b.data.order);
+const counts = new Map<string, number>();
+for (const page of pages) counts.set(page.data.track, (counts.get(page.data.track) ?? 0) + 1);
+---
+<Base title="HelpMePrep" description="Shreyash Bhatkar's interview prep notes: system design, LLD, and DSA in C++.">
+  <article class="article">
+    <p class="kicker">Interview prep notes</p>
+    <div class="hero">
+      <h1>HelpMePrep</h1>
+      <p class="lede">
+        My notes for system design, low-level design, and DSA interviews.
+        Read in order when a topic is new. Jump to a worked problem when drilling.
+      </p>
+    </div>
+    <div class="grid-cards">
+      {companies.map((c) => (
+        <a class="card" href={`${base}companies/${companyRouteId(c)}`}>
+          <div class="eyebrow">{c.data.when}</div>
+          <h2>{c.data.title}</h2>
+          <p>{c.data.role}. {c.data.summary}</p>
+        </a>
+      ))}
+    </div>
+    <h2>Tracks</h2>
+    <div class="grid-cards">
+      {trackConfigs.map((track) => {
+        const first = pages.find((p) => p.data.track === track.id);
+        const n = counts.get(track.id) ?? 0;
+        return (
+          <a class="card" href={first ? `${base}${pageSlug(first)}` : base}>
+            <div class="eyebrow">{track.eyebrow} · {n} {n === 1 ? "page" : "pages"}</div>
+            <h2>{track.title}</h2>
+            <p>{track.summary}</p>
+          </a>
+        );
+      })}
+    </div>
+    <div class="prose">
+      <h2>How to use this</h2>
+      <ol>
+        <li>For a 45-minute design round, learn the delivery clock first, then one worked problem out loud with a drawing tool and a visible timer.</li>
+        <li>Mark a page complete when you can teach it without notes. Quiz scores stay in this browser.</li>
+        <li>Company tabs are prep plans for specific loops.</li>
+        <li>Search is full-text across the notes. Dark mode and progress survive reloads on this machine only.</li>
+      </ol>
+      <p>Nothing here is synced to a server.</p>
+    </div>
+  </article>
+</Base>

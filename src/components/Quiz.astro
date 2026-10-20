@@ -1,0 +1,29 @@
+---
+import type { QuizItem } from "../content.config";
+interface Props {
+  slug: string;
+  quiz: QuizItem[];
+}
+const { slug, quiz } = Astro.props;
+const json = JSON.stringify(quiz).replace(/</g, "\\u003c");
+---
+<section class="quiz" data-quiz-root data-slug={slug} aria-labelledby="quiz-heading">
+  <h2 id="quiz-heading">Check yourself</h2>
+  <p class="quiz-score" data-score>Answer the questions. Multiple choice is scored on this device only.</p>
+  <script type="application/json" data-quiz-json set:html={json}></script>
+  {quiz.map((item, i) => (
+    <article class="q" data-q={i}>
+      <p>{i + 1}. {item.question}</p>
+      {item.kind === "mc" ? (
+        <div class="choices">
+          {(item.choices ?? []).map((choice, c) => (
+            <button type="button" data-choice={c}>{choice}</button>
+          ))}
+        </div>
+      ) : (
+        <button class="reveal-btn" type="button" data-reveal>Show answer</button>
+      )}
+      <p class="explain" data-explain hidden></p>
+    </article>
+  ))}
+</section>
